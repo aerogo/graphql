@@ -2,7 +2,8 @@
 	"errors": null,
 	"data": {
 		"User": {
-			"name": "Eduard Urbach"
+			"nick": "Akyoto",
+			"website": "eduardurbach.com"
 		}
 	}
 }

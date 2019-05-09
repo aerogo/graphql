@@ -1,8 +1,10 @@
 package graphql
 
+type ArgumentsList = map[string]interface{}
+
 type Field struct {
 	name      string
-	arguments map[string]string
+	arguments ArgumentsList
 	fields    []*Field
 	parent    FieldContainer
 }

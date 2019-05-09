@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"strconv"
 	"strings"
 )
 
@@ -38,7 +39,11 @@ func Parse(reader io.Reader) (*Document, error) {
 
 				if argumentsPos != -1 {
 					field.name = blockPrefix[:argumentsPos]
-					field.arguments = parseArguments(blockPrefix[argumentsPos+1 : len(blockPrefix)-1])
+					field.arguments, err = parseArguments(blockPrefix[argumentsPos+1 : len(blockPrefix)-1])
+
+					if err != nil {
+						return nil, err
+					}
 				}
 
 				fmt.Println(field.name)
@@ -79,8 +84,8 @@ func Parse(reader io.Reader) (*Document, error) {
 	return document, nil
 }
 
-func parseArguments(raw string) map[string]string {
-	arguments := map[string]string{}
+func parseArguments(raw string) (ArgumentsList, error) {
+	arguments := ArgumentsList{}
 
 	// TODO: Use ignore.Reader
 	lines := strings.Split(raw, ",")
@@ -90,8 +95,31 @@ func parseArguments(raw string) map[string]string {
 		name := strings.TrimSpace(parts[0])
 		value := strings.TrimSpace(parts[1])
 
-		arguments[name] = value
+		switch {
+		// String
+		case strings.HasPrefix(value, `"`) && strings.HasSuffix(value, `"`):
+			value = value[1 : len(value)-1]
+			arguments[name] = value
+		// Float
+		case strings.Contains(value, "."):
+			floatValue, err := strconv.ParseFloat(value, 64)
+
+			if err != nil {
+				return nil, err
+			}
+
+			arguments[name] = floatValue
+		// Int
+		default:
+			intValue, err := strconv.Atoi(value)
+
+			if err != nil {
+				return nil, err
+			}
+
+			arguments[name] = intValue
+		}
 	}
 
-	return arguments
+	return arguments, nil
 }
