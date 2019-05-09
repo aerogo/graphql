@@ -2,7 +2,7 @@ package graphql
 
 // Document represents a GraphQL request.
 type Document struct {
-	Definitions []*Definition
+	Query *Query
 }
 
 // Execute executes the operations defined in the GraphQL document.

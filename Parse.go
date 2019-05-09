@@ -1,7 +1,6 @@
 package graphql
 
 import (
-	"fmt"
 	"io"
 	"io/ioutil"
 	"strings"
@@ -15,12 +14,11 @@ func Parse(reader io.Reader) (*Document, error) {
 		return nil, err
 	}
 
-	document := &Document{
-		Definitions: []*Definition{},
-	}
+	document := &Document{}
 
 	// State
 	lineStart := 0
+	inQuery := false
 
 	// Loop over the characters
 	for i := 0; i < len(body); i++ {
@@ -28,7 +26,17 @@ func Parse(reader io.Reader) (*Document, error) {
 		case '{':
 			blockPrefix := string(body[lineStart:i])
 			blockPrefix = strings.TrimSpace(blockPrefix)
-			fmt.Println("BLOCK", blockPrefix)
+
+			if inQuery {
+				document.Query.Collections = append(document.Query.Collections, &Collection{
+					Name: blockPrefix,
+				})
+			}
+
+			if blockPrefix == "query" {
+				document.Query = &Query{}
+				inQuery = true
+			}
 		case '}':
 
 		case '\n':

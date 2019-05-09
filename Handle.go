@@ -14,5 +14,5 @@ func Handle(ctx *aero.Context) string {
 		return ctx.Error(http.StatusBadRequest, err)
 	}
 
-	return ctx.JSON(document)
+	return ctx.JSON(document.Execute())
 }

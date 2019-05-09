@@ -1,6 +1,5 @@
 query {
-	user(id: 123) {
-		id
+	User(id: 123) {
 		name
 	}
 }
