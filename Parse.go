@@ -38,7 +38,7 @@ func Parse(reader io.Reader) (*Document, error) {
 
 				if argumentsPos != -1 {
 					field.name = blockPrefix[:argumentsPos]
-					field.arguments = []string{blockPrefix[argumentsPos:]}
+					field.arguments = parseArguments(blockPrefix[argumentsPos+1 : len(blockPrefix)-1])
 				}
 
 				fmt.Println(field.name)
@@ -77,4 +77,21 @@ func Parse(reader io.Reader) (*Document, error) {
 	}
 
 	return document, nil
+}
+
+func parseArguments(raw string) map[string]string {
+	arguments := map[string]string{}
+
+	// TODO: Use ignore.Reader
+	lines := strings.Split(raw, ",")
+
+	for _, line := range lines {
+		parts := strings.Split(line, ":")
+		name := strings.TrimSpace(parts[0])
+		value := strings.TrimSpace(parts[1])
+
+		arguments[name] = value
+	}
+
+	return arguments
 }

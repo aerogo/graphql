@@ -2,7 +2,7 @@ package graphql
 
 type Field struct {
 	name      string
-	arguments []string
+	arguments map[string]string
 	fields    []*Field
 	parent    FieldContainer
 }
