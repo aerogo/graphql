@@ -1,8 +1,18 @@
 package graphql
 
-import "github.com/aerogo/aero"
+import (
+	"net/http"
+
+	"github.com/aerogo/aero"
+)
 
 // Handle deals with a GraphQL request and responds to it.
 func Handle(ctx *aero.Context) string {
-	return ctx.JSON("abc")
+	document, err := Parse(ctx.Request().Body().Reader())
+
+	if err != nil {
+		return ctx.Error(http.StatusBadRequest, err)
+	}
+
+	return ctx.JSON(document)
 }
