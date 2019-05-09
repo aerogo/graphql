@@ -1,5 +1,7 @@
 package graphql
 
+import "errors"
+
 type ArgumentsList = map[string]interface{}
 
 type Field struct {
@@ -15,4 +17,12 @@ func (field *Field) AddField(newField *Field) {
 
 func (field *Field) Parent() FieldContainer {
 	return field.parent
+}
+
+func (field *Field) Resolve(db Database) (interface{}, error) {
+	if len(field.arguments) == 1 && field.arguments["id"] != nil {
+		return db.Get(field.name, field.arguments["id"].(string))
+	}
+
+	return nil, errors.New("This parameter is not available in the resolver")
 }
