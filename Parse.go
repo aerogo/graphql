@@ -1,7 +1,6 @@
 package graphql
 
 import (
-	"fmt"
 	"io"
 	"io/ioutil"
 	"strconv"
@@ -46,7 +45,6 @@ func Parse(reader io.Reader) (*Document, error) {
 					}
 				}
 
-				fmt.Println(field.name)
 				currentContainer.AddField(field)
 				currentContainer = field
 			}
@@ -73,7 +71,6 @@ func Parse(reader io.Reader) (*Document, error) {
 					}
 
 					currentContainer.AddField(field)
-					fmt.Println(field.name)
 				}
 			}
 

@@ -2,8 +2,6 @@ package graphql
 
 import (
 	"reflect"
-
-	"github.com/akyoto/color"
 )
 
 type KeyValueStore map[string]interface{}
@@ -15,7 +13,6 @@ type Document struct {
 
 // Execute executes the operations defined in the GraphQL document.
 func (document *Document) Execute(db Database) *Response {
-	color.Yellow("EXECUTE")
 	var data KeyValueStore
 	var allErrors []string
 

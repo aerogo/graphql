@@ -1,7 +1,6 @@
 package graphql
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/aerogo/aero"
@@ -17,7 +16,6 @@ func Handler(db Database) aero.Handle {
 		}
 
 		response := ctx.JSON(document.Execute(db))
-		fmt.Println(response)
 		return response
 	}
 }
