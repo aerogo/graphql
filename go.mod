@@ -8,7 +8,7 @@ require (
 	github.com/aerogo/http v1.0.3
 	github.com/aerogo/mirror v0.2.0
 	github.com/aerogo/nano v0.2.0
-	github.com/akyoto/color v1.8.3
+	github.com/json-iterator/go v1.1.6
 	github.com/stretchr/testify v1.3.0
 	golang.org/x/sys v0.0.0-20190509141414-a5b02f93d862 // indirect
 )

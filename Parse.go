@@ -2,14 +2,17 @@ package graphql
 
 import (
 	"io"
-	"io/ioutil"
 	"strconv"
 	"strings"
+
+	jsoniter "github.com/json-iterator/go"
 )
 
 // Parse parses the request from the body reader and returns a GraphQL document.
 func Parse(reader io.Reader) (*Document, error) {
-	body, err := ioutil.ReadAll(reader)
+	request := Request{}
+	decoder := jsoniter.NewDecoder(reader)
+	err := decoder.Decode(&request)
 
 	if err != nil {
 		return nil, err
@@ -22,10 +25,10 @@ func Parse(reader io.Reader) (*Document, error) {
 	processedUntil := 0
 
 	// Loop over the characters
-	for i := 0; i < len(body); i++ {
-		switch body[i] {
+	for i := 0; i < len(request.Query); i++ {
+		switch request.Query[i] {
 		case '{':
-			blockPrefix := string(body[processedUntil:i])
+			blockPrefix := string(request.Query[processedUntil:i])
 			blockPrefix = strings.TrimSpace(blockPrefix)
 
 			if currentContainer != nil {
@@ -61,7 +64,7 @@ func Parse(reader io.Reader) (*Document, error) {
 
 		case '\n':
 			if currentContainer != nil {
-				blockPrefix := string(body[processedUntil:i])
+				blockPrefix := string(request.Query[processedUntil:i])
 				blockPrefix = strings.TrimSpace(blockPrefix)
 
 				if len(blockPrefix) > 0 {
