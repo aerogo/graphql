@@ -4,7 +4,7 @@ import (
 	"reflect"
 )
 
-type KeyValueStore map[string]interface{}
+type Variables map[string]interface{}
 
 // Document represents a GraphQL request.
 type Document struct {
@@ -13,7 +13,7 @@ type Document struct {
 
 // Execute executes the operations defined in the GraphQL document.
 func (document *Document) Execute(db Database) *Response {
-	var data KeyValueStore
+	var data Variables
 	var allErrors []string
 
 	if document.Query != nil {
@@ -26,10 +26,10 @@ func (document *Document) Execute(db Database) *Response {
 	}
 }
 
-func resolve(container FieldContainer, parent interface{}, db Database) (KeyValueStore, []string) {
+func resolve(container FieldContainer, parent interface{}, db Database) (Variables, []string) {
 	var allErrors []string
 	var errors []string
-	data := KeyValueStore{}
+	data := Variables{}
 
 	for _, field := range container.Fields() {
 		obj, err := field.Resolve(parent, db)

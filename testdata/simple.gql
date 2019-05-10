@@ -1,5 +1,5 @@
 query {
-	User(id: "4J6qpK1ve") {
+	User(id: $id) {
 		Nick
 		Website
 	}

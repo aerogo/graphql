@@ -13,6 +13,7 @@ func Handler(db Database) aero.Handle {
 
 		if err != nil {
 			ctx.StatusCode = http.StatusBadRequest
+
 			return ctx.JSON(&Response{
 				Errors: []string{
 					err.Error(),

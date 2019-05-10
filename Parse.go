@@ -1,6 +1,7 @@
 package graphql
 
 import (
+	"fmt"
 	"io"
 	"strconv"
 	"strings"
@@ -41,7 +42,7 @@ func Parse(reader io.Reader) (*Document, error) {
 
 				if argumentsPos != -1 {
 					field.name = blockPrefix[:argumentsPos]
-					field.arguments, err = parseArguments(blockPrefix[argumentsPos+1 : len(blockPrefix)-1])
+					field.arguments, err = parseArguments(blockPrefix[argumentsPos+1:len(blockPrefix)-1], request.Variables)
 
 					if err != nil {
 						return nil, err
@@ -84,7 +85,7 @@ func Parse(reader io.Reader) (*Document, error) {
 	return document, nil
 }
 
-func parseArguments(raw string) (ArgumentsList, error) {
+func parseArguments(raw string, variables Variables) (ArgumentsList, error) {
 	arguments := ArgumentsList{}
 
 	// TODO: Use ignore.Reader
@@ -96,10 +97,22 @@ func parseArguments(raw string) (ArgumentsList, error) {
 		value := strings.TrimSpace(parts[1])
 
 		switch {
+		// Variable
+		case strings.HasPrefix(value, "$"):
+			varName := strings.TrimPrefix(value, "$")
+			value, found := variables[varName]
+
+			if !found {
+				return nil, fmt.Errorf("Variable %s doesn't exist", varName)
+			}
+
+			arguments[name] = value
+
 		// String
 		case strings.HasPrefix(value, `"`) && strings.HasSuffix(value, `"`):
 			value = value[1 : len(value)-1]
 			arguments[name] = value
+
 		// Float
 		case strings.Contains(value, "."):
 			floatValue, err := strconv.ParseFloat(value, 64)
@@ -109,6 +122,7 @@ func parseArguments(raw string) (ArgumentsList, error) {
 			}
 
 			arguments[name] = floatValue
+
 		// Int
 		default:
 			intValue, err := strconv.Atoi(value)

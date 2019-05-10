@@ -3,6 +3,7 @@ package graphql_test
 import (
 	"fmt"
 	"io/ioutil"
+	"strings"
 	"syscall"
 	"testing"
 
@@ -25,11 +26,13 @@ func Test(t *testing.T) {
 	defer db.Close()
 	defer db.Clear("User")
 
-	db.Set("User", "4J6qpK1ve", &User{
+	testUser := &User{
 		ID:      "4J6qpK1ve",
 		Nick:    "Akyoto",
 		Website: "eduardurbach.com",
-	})
+	}
+
+	db.Set("User", testUser.ID, testUser)
 
 	// Create web app
 	app := aero.New()
@@ -43,6 +46,9 @@ func Test(t *testing.T) {
 
 		request = request.BodyJSON(&graphql.Request{
 			Query: string(query),
+			Variables: graphql.Variables{
+				"id": testUser.ID,
+			},
 		})
 
 		response, err := request.End()
@@ -51,6 +57,7 @@ func Test(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NotNil(t, response)
 		assert.True(t, response.Ok(), "Status %d", response.StatusCode())
+		assert.True(t, strings.Contains(response.String(), testUser.Nick))
 
 		// Kill server
 		err = syscall.Kill(syscall.Getpid(), syscall.SIGTERM)
