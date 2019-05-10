@@ -2,21 +2,38 @@ package graphql
 
 import (
 	"fmt"
-	"io"
+	"io/ioutil"
 	"strconv"
 	"strings"
 
+	"github.com/aerogo/aero"
 	jsoniter "github.com/json-iterator/go"
 )
 
 // Parse parses the request from the body reader and returns a GraphQL document.
-func Parse(reader io.Reader) (*Document, error) {
+func Parse(ctx *aero.Context) (*Document, error) {
+	httpRequest := ctx.Request()
+	reader := httpRequest.Body().Reader()
 	request := Request{}
-	decoder := jsoniter.NewDecoder(reader)
-	err := decoder.Decode(&request)
+	var err error
 
-	if err != nil {
-		return nil, err
+	if httpRequest.Header().Get("Content-Type") == "application/graphql" {
+		// Body contains only the query
+		body, err := ioutil.ReadAll(reader)
+
+		if err != nil {
+			return nil, err
+		}
+
+		request.Query = string(body)
+	} else {
+		// Body contains full GraphQL request
+		decoder := jsoniter.NewDecoder(reader)
+		err := decoder.Decode(&request)
+
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	document := &Document{}
@@ -41,7 +58,7 @@ func Parse(reader io.Reader) (*Document, error) {
 				argumentsPos := strings.Index(blockPrefix, "(")
 
 				if argumentsPos != -1 {
-					field.name = blockPrefix[:argumentsPos]
+					field.name = strings.TrimSpace(blockPrefix[:argumentsPos])
 					field.arguments, err = parseArguments(blockPrefix[argumentsPos+1:len(blockPrefix)-1], request.Variables)
 
 					if err != nil {

@@ -1,0 +1,25 @@
+{
+	"__type": {
+		"name": "User",
+		"fields": [
+			{
+				"name": "id",
+				"type": {
+					"name": "String"
+				}
+			},
+			{
+				"name": "name",
+				"type": {
+					"name": "String"
+				}
+			},
+			{
+				"name": "birthday",
+				"type": {
+					"name": "Date"
+				}
+			}
+		]
+	}
+}
