@@ -21,7 +21,6 @@ func Handler(db Database) aero.Handle {
 			})
 		}
 
-		response := ctx.JSON(document.Execute(db))
-		return response
+		return ctx.JSON(document.Execute(db))
 	}
 }
