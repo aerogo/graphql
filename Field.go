@@ -31,15 +31,7 @@ func (field *Field) Parent() FieldContainer {
 
 func (field *Field) Resolve(parent interface{}, db Database) (interface{}, error) {
 	if parent == nil {
-		if strings.HasPrefix(field.name, "All") {
-			return field.ResolveAll(db)
-		}
-
-		if len(field.arguments) != 1 || field.arguments["ID"] == nil {
-			return nil, errors.New("Can only query objects by 'ID'")
-		}
-
-		return db.Get(field.name, field.arguments["ID"].(string))
+		return field.ResolveRootQuery(db)
 	}
 
 	structField, _, value, err := mirror.GetChildField(parent, field.name)
@@ -53,6 +45,18 @@ func (field *Field) Resolve(parent interface{}, db Database) (interface{}, error
 	}
 
 	return value.Interface(), nil
+}
+
+func (field *Field) ResolveRootQuery(db Database) (interface{}, error) {
+	if strings.HasPrefix(field.name, "All") {
+		return field.ResolveAll(db)
+	}
+
+	if len(field.arguments) != 1 || field.arguments["ID"] == nil {
+		return nil, errors.New("Can only query objects by 'ID'")
+	}
+
+	return db.Get(field.name, field.arguments["ID"].(string))
 }
 
 func (field *Field) ResolveAll(db Database) (interface{}, error) {
