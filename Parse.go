@@ -46,7 +46,7 @@ func Parse(ctx *aero.Context) (*Document, error) {
 	for i := 0; i < len(request.Query); i++ {
 		switch request.Query[i] {
 		case '{':
-			blockPrefix := string(request.Query[processedUntil:i])
+			blockPrefix := request.Query[processedUntil:i]
 			blockPrefix = strings.TrimSpace(blockPrefix)
 
 			if currentContainer != nil {
@@ -82,7 +82,7 @@ func Parse(ctx *aero.Context) (*Document, error) {
 
 		case '\n':
 			if currentContainer != nil {
-				blockPrefix := string(request.Query[processedUntil:i])
+				blockPrefix := request.Query[processedUntil:i]
 				blockPrefix = strings.TrimSpace(blockPrefix)
 
 				if len(blockPrefix) > 0 {
