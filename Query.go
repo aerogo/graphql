@@ -2,11 +2,15 @@ package graphql
 
 // Query represents a query.
 type Query struct {
-	Fields []*Field
+	fields []*Field
 }
 
 func (query *Query) AddField(field *Field) {
-	query.Fields = append(query.Fields, field)
+	query.fields = append(query.fields, field)
+}
+
+func (query *Query) Fields() []*Field {
+	return query.fields
 }
 
 func (query *Query) Parent() FieldContainer {

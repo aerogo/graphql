@@ -1,6 +1,6 @@
 query {
 	User(id: "4J6qpK1ve") {
-		nick
-		website
+		Nick
+		Website
 	}
 }

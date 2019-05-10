@@ -1,9 +1,9 @@
 {
-	"errors": null,
 	"data": {
 		"User": {
-			"nick": "Akyoto",
-			"website": "eduardurbach.com"
+			"Nick": "Akyoto",
+			"Website": "eduardurbach.com"
 		}
-	}
+	},
+	"errors": null
 }
