@@ -34,6 +34,14 @@ func Test(t *testing.T) {
 
 	db.Set("User", testUser.ID, testUser)
 
+	otherUser := &User{
+		ID:      "VJOK1ckvx",
+		Nick:    "Scott",
+		Website: "github.com/soulcramer",
+	}
+
+	db.Set("User", otherUser.ID, otherUser)
+
 	// Create web app
 	app := aero.New()
 	app.Post("/", graphql.Handler(db))
@@ -57,6 +65,7 @@ func Test(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NotNil(t, response)
 		assert.True(t, response.Ok(), "Status %d", response.StatusCode())
+		fmt.Println(response.String())
 		assert.True(t, strings.Contains(response.String(), testUser.Nick))
 
 		// Kill server

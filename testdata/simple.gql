@@ -1,5 +1,5 @@
 {
-	User(id: $id) {
+	User(ID: $id) {
 		Nick
 		Website
 	}
