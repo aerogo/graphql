@@ -2,6 +2,7 @@ package graphql
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/aerogo/mirror"
 )
@@ -36,10 +37,14 @@ func (field *Field) Resolve(obj interface{}, db Database) (interface{}, error) {
 		return nil, errors.New("This parameter is not available in the resolver")
 	}
 
-	_, _, v, err := mirror.GetChildField(obj, field.name)
+	t, _, v, err := mirror.GetChildField(obj, field.name)
 
 	if err != nil {
 		return nil, err
+	}
+
+	if t.Tag.Get("private") == "true" {
+		return nil, fmt.Errorf("%s is a private field", field.name)
 	}
 
 	return v.Interface(), nil

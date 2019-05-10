@@ -40,7 +40,12 @@ func Test(t *testing.T) {
 	app.OnStart(func() {
 		// Request
 		request := client.Post(fmt.Sprintf("http://localhost:%d/", app.Config.Ports.HTTP))
-		request = request.Body(query)
+
+		request = request.BodyJSON(&graphql.Request{
+			Query:     string(query),
+			Variables: "",
+		})
+
 		response, err := request.End()
 
 		// Error checks
