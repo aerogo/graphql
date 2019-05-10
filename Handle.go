@@ -12,7 +12,12 @@ func Handler(db Database) aero.Handle {
 		document, err := Parse(ctx.Request().Body().Reader())
 
 		if err != nil {
-			return ctx.Error(http.StatusBadRequest, err)
+			ctx.StatusCode = http.StatusBadRequest
+			return ctx.JSON(&Response{
+				Errors: []string{
+					err.Error(),
+				},
+			})
 		}
 
 		response := ctx.JSON(document.Execute(db))
