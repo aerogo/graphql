@@ -53,7 +53,7 @@ func Parse(reader io.Reader) (*Document, error) {
 				currentContainer = field
 			}
 
-			if blockPrefix == "query" {
+			if blockPrefix == "" || blockPrefix == "query" {
 				document.Query = &Query{}
 				currentContainer = document.Query
 			}

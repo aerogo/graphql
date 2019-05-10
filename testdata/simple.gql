@@ -1,4 +1,4 @@
-query {
+{
 	User(id: $id) {
 		Nick
 		Website
