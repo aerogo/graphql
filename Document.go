@@ -4,8 +4,6 @@ import (
 	"reflect"
 )
 
-type Variables map[string]interface{}
-
 // Document represents a GraphQL request.
 type Document struct {
 	Query *Query
@@ -26,10 +24,10 @@ func (document *Document) Execute(db Database) *Response {
 	}
 }
 
-func resolve(container FieldContainer, parent interface{}, db Database) (Variables, []string) {
+func resolve(container FieldContainer, parent interface{}, db Database) (Map, []string) {
 	var allErrors []string
 	var errors []string
-	data := Variables{}
+	data := Map{}
 
 	for _, field := range container.Fields() {
 		obj, err := field.Resolve(parent, db)
@@ -47,7 +45,7 @@ func resolve(container FieldContainer, parent interface{}, db Database) (Variabl
 				continue
 			}
 
-			slice := make([]Variables, value.Len())
+			slice := make([]Map, value.Len())
 
 			for i := 0; i < value.Len(); i++ {
 				element := value.Index(i).Interface()

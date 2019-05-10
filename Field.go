@@ -8,27 +8,30 @@ import (
 	"github.com/aerogo/mirror"
 )
 
-type ArgumentsList = map[string]interface{}
-
+// Field represents a queryable field.
 type Field struct {
 	name      string
-	arguments ArgumentsList
+	arguments Map
 	fields    []*Field
 	parent    FieldContainer
 }
 
+// AddField adds a field to the query.
 func (field *Field) AddField(newField *Field) {
 	field.fields = append(field.fields, newField)
 }
 
+// Fields returns the list of fields inside the query.
 func (field *Field) Fields() []*Field {
 	return field.fields
 }
 
+// Parent is always nil for queries.
 func (field *Field) Parent() FieldContainer {
 	return field.parent
 }
 
+// Resolve resolves the field value for the given parent in the given database.
 func (field *Field) Resolve(parent interface{}, db Database) (interface{}, error) {
 	if parent == nil {
 		return field.ResolveRootQuery(db)
@@ -47,6 +50,7 @@ func (field *Field) Resolve(parent interface{}, db Database) (interface{}, error
 	return value.Interface(), nil
 }
 
+// ResolveRootQuery resolves a root query.
 func (field *Field) ResolveRootQuery(db Database) (interface{}, error) {
 	if strings.HasPrefix(field.name, "All") {
 		return field.ResolveAll(db)
@@ -59,6 +63,7 @@ func (field *Field) ResolveRootQuery(db Database) (interface{}, error) {
 	return db.Get(field.name, field.arguments["ID"].(string))
 }
 
+// ResolveAll returns a list of objects that matches the filter arguments.
 func (field *Field) ResolveAll(db Database) (interface{}, error) {
 	records := []interface{}{}
 	typeName := strings.TrimPrefix(field.name, "All")

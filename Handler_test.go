@@ -14,6 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// User as a type of sample data
 type User struct {
 	ID      string `json:"id"`
 	Nick    string `json:"nick"`
@@ -54,7 +55,7 @@ func Test(t *testing.T) {
 
 		request = request.BodyJSON(&graphql.Request{
 			Query: string(query),
-			Variables: graphql.Variables{
+			Variables: graphql.Map{
 				"id": testUser.ID,
 			},
 		})

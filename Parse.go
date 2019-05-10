@@ -102,8 +102,8 @@ func Parse(ctx *aero.Context) (*Document, error) {
 	return document, nil
 }
 
-func parseArguments(raw string, variables Variables) (ArgumentsList, error) {
-	arguments := ArgumentsList{}
+func parseArguments(raw string, variables Map) (Map, error) {
+	arguments := Map{}
 
 	// TODO: Use ignore.Reader
 	lines := strings.Split(raw, ",")
