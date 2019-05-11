@@ -50,8 +50,21 @@ func (field *Field) Resolve(parent interface{}, api *API) (interface{}, error) {
 		return t.Name(), nil
 	}
 
+	// Aliases
+	name := field.name
+	typeName := reflect.TypeOf(parent).Name()
+	aliasMap := api.aliases[typeName]
+
+	if aliasMap != nil {
+		aliasedName, hasAlias := aliasMap[field.name]
+
+		if hasAlias {
+			name = aliasedName
+		}
+	}
+
 	// Fields that are direct descendants
-	structField, _, value, err := mirror.GetChildField(parent, field.name)
+	structField, _, value, err := mirror.GetChildField(parent, name)
 
 	if err != nil {
 		return nil, err
@@ -63,8 +76,6 @@ func (field *Field) Resolve(parent interface{}, api *API) (interface{}, error) {
 
 	return value.Interface(), nil
 }
-
-// BRB.
 
 // ResolveRootQuery resolves a root query.
 func (field *Field) ResolveRootQuery(api *API) (interface{}, error) {

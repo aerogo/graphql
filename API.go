@@ -2,34 +2,97 @@ package graphql
 
 import (
 	"net/http"
+	"reflect"
 
 	"github.com/aerogo/aero"
 )
 
 // API represents the API configuration for GraphQL.
 type API struct {
-	db            Database
+	// The database interface
+	db Database
+
+	// Custom root query resolvers
 	rootResolvers []Resolver
-	schema        *Schema
+
+	// The schema we compile on creation
+	schema __Schema
+
+	// A map of type names to field aliases
+	aliases map[string]AliasMap
 }
 
 // New creates a new GraphQL API.
 func New(db Database) *API {
-	schemaTypes := []SchemaType{}
+	aliases := map[string]AliasMap{}
+
+	// Introspection
+	schemaTypes := []__SchemaType{}
 
 	for _, typ := range db.Types() {
-		schemaTypes = append(schemaTypes, SchemaType{
+		schemaTypes = append(schemaTypes, __SchemaType{
 			Name: typ.Name(),
 		})
+
+		if typ.Kind() != reflect.Struct {
+			continue
+		}
+
+		registerJSONAliases(typ, aliases)
 	}
 
-	schema := &Schema{
-		Types: schemaTypes,
+	schemaType := __SchemaType{
+		Name: "__Schema",
 	}
+
+	schemaTypes = append(schemaTypes)
+
+	queryType := __QueryType{
+		Name: "Query",
+	}
+
+	mutationType := __MutationType{
+		Name: "Mutation",
+	}
+
+	subscriptionType := __SubscriptionType{
+		Name: "Subscription",
+	}
+
+	schema := __Schema{
+		Types:            schemaTypes,
+		QueryType:        queryType,
+		MutationType:     mutationType,
+		SubscriptionType: subscriptionType,
+	}
+
+	registerJSONAliases(reflect.TypeOf(schema), aliases)
+	registerJSONAliases(reflect.TypeOf(schemaType), aliases)
+	registerJSONAliases(reflect.TypeOf(queryType), aliases)
+	registerJSONAliases(reflect.TypeOf(mutationType), aliases)
+	registerJSONAliases(reflect.TypeOf(subscriptionType), aliases)
 
 	return &API{
-		db:     db,
-		schema: schema,
+		db:      db,
+		schema:  schema,
+		aliases: aliases,
+	}
+}
+
+// registerJSONAliases checks all fields for json tags and adds the tags as field aliases.
+func registerJSONAliases(typ reflect.Type, aliases map[string]AliasMap) {
+	typeAliases := AliasMap{}
+	aliases[typ.Name()] = typeAliases
+
+	for i := 0; i < typ.NumField(); i++ {
+		field := typ.Field(i)
+		jsonTag := field.Tag.Get("json")
+
+		if jsonTag == "" || jsonTag == "-" {
+			continue
+		}
+
+		typeAliases[jsonTag] = field.Name
 	}
 }
 
