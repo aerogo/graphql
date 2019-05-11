@@ -104,6 +104,17 @@ func Parse(ctx *aero.Context) (*Document, error) {
 						parent: currentContainer,
 					}
 
+					argumentsPos := strings.Index(blockPrefix, "(")
+
+					if argumentsPos != -1 {
+						field.name = strings.TrimSpace(blockPrefix[:argumentsPos])
+						field.arguments, err = parseArguments(blockPrefix[argumentsPos+1:len(blockPrefix)-1], request.Variables)
+
+						if err != nil {
+							return nil, err
+						}
+					}
+
 					currentContainer.AddField(field)
 				}
 			}

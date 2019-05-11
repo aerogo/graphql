@@ -20,8 +20,8 @@ func New(db Database) *API {
 }
 
 // AddRootResolver adds a new resolver for root queries.
-// The resolver can return the resolved object and a bool flag
-// that determines whether the request has been dealt with or not.
+// The resolver can return the resolved object, an error and a bool
+// flag that determines whether the request has been dealt with or not.
 func (api *API) AddRootResolver(resolver Resolver) {
 	api.rootResolvers = append(api.rootResolvers, resolver)
 }

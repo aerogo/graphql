@@ -50,14 +50,16 @@ func (field *Field) Resolve(parent interface{}, api *API) (interface{}, error) {
 	return value.Interface(), nil
 }
 
+// BRB.
+
 // ResolveRootQuery resolves a root query.
 func (field *Field) ResolveRootQuery(api *API) (interface{}, error) {
 	// Custom resolvers
 	for _, resolve := range api.rootResolvers {
-		obj, ok := resolve(field.name, field.arguments)
+		obj, err, ok := resolve(field.name, field.arguments)
 
 		if ok {
-			return obj, nil
+			return obj, err
 		}
 	}
 
