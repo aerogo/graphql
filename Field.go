@@ -3,6 +3,7 @@ package graphql
 import (
 	"errors"
 	"fmt"
+	"reflect"
 	"strings"
 
 	"github.com/aerogo/mirror"
@@ -33,10 +34,23 @@ func (field *Field) Parent() FieldContainer {
 
 // Resolve resolves the field value for the given parent in the given database.
 func (field *Field) Resolve(parent interface{}, api *API) (interface{}, error) {
+	// If we have no parent object, treat it as a root query
 	if parent == nil {
 		return field.ResolveRootQuery(api)
 	}
 
+	// Allow querying the current type name
+	if field.name == "__typename" {
+		t := reflect.TypeOf(parent)
+
+		if t.Kind() == reflect.Ptr {
+			t = t.Elem()
+		}
+
+		return t.Name(), nil
+	}
+
+	// Fields that are direct descendants
 	structField, _, value, err := mirror.GetChildField(parent, field.name)
 
 	if err != nil {
