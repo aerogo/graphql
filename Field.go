@@ -32,9 +32,9 @@ func (field *Field) Parent() FieldContainer {
 }
 
 // Resolve resolves the field value for the given parent in the given database.
-func (field *Field) Resolve(parent interface{}, db Database) (interface{}, error) {
+func (field *Field) Resolve(parent interface{}, api *API) (interface{}, error) {
 	if parent == nil {
-		return field.ResolveRootQuery(db)
+		return field.ResolveRootQuery(api)
 	}
 
 	structField, _, value, err := mirror.GetChildField(parent, field.name)
@@ -51,10 +51,10 @@ func (field *Field) Resolve(parent interface{}, db Database) (interface{}, error
 }
 
 // ResolveRootQuery resolves a root query.
-func (field *Field) ResolveRootQuery(db Database) (interface{}, error) {
+func (field *Field) ResolveRootQuery(api *API) (interface{}, error) {
 	// "All" queries
 	if strings.HasPrefix(field.name, "All") {
-		return field.ResolveAll(db)
+		return field.ResolveAll(api)
 	}
 
 	// Single object queries
@@ -62,15 +62,15 @@ func (field *Field) ResolveRootQuery(db Database) (interface{}, error) {
 		return nil, errors.New("Can only query objects by 'ID'")
 	}
 
-	if !db.HasType(field.name) {
+	if !api.db.HasType(field.name) {
 		return nil, fmt.Errorf("Type '%s' does not exist", field.name)
 	}
 
-	return db.Get(field.name, field.arguments["ID"].(string))
+	return api.db.Get(field.name, field.arguments["ID"].(string))
 }
 
 // ResolveAll returns a list of objects that matches the filter arguments.
-func (field *Field) ResolveAll(db Database) (interface{}, error) {
+func (field *Field) ResolveAll(api *API) (interface{}, error) {
 	records := []interface{}{}
 	typeName := strings.TrimPrefix(field.name, "All")
 
@@ -84,7 +84,7 @@ func (field *Field) ResolveAll(db Database) (interface{}, error) {
 		field.arguments[argName] = argValue
 	}
 
-	for record := range db.All(typeName) {
+	for record := range api.db.All(typeName) {
 		matchingFields := 0
 
 		for argName, argValue := range field.arguments {

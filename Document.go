@@ -10,12 +10,12 @@ type Document struct {
 }
 
 // Execute executes the operations defined in the GraphQL document.
-func (document *Document) Execute(db Database) *Response {
+func (document *Document) Execute(api *API) *Response {
 	var data interface{}
 	var allErrors []string
 
 	if document.Operation != nil {
-		data, allErrors = resolve(document.Operation, nil, db)
+		data, allErrors = resolve(document.Operation, nil, api)
 	}
 
 	return &Response{
@@ -24,13 +24,13 @@ func (document *Document) Execute(db Database) *Response {
 	}
 }
 
-func resolve(container FieldContainer, parent interface{}, db Database) (Map, []string) {
+func resolve(container FieldContainer, parent interface{}, api *API) (Map, []string) {
 	var allErrors []string
 	var errors []string
 	data := Map{}
 
 	for _, field := range container.Fields() {
-		obj, err := field.Resolve(parent, db)
+		obj, err := field.Resolve(parent, api)
 
 		if err != nil {
 			allErrors = append(allErrors, err.Error())
@@ -49,7 +49,7 @@ func resolve(container FieldContainer, parent interface{}, db Database) (Map, []
 
 			for i := 0; i < value.Len(); i++ {
 				element := value.Index(i).Interface()
-				slice[i], errors = resolve(field, element, db)
+				slice[i], errors = resolve(field, element, api)
 
 				if errors != nil {
 					allErrors = append(allErrors, errors...)
@@ -63,7 +63,7 @@ func resolve(container FieldContainer, parent interface{}, db Database) (Map, []
 				continue
 			}
 
-			data[field.name], errors = resolve(field, obj, db)
+			data[field.name], errors = resolve(field, obj, api)
 
 			if errors != nil {
 				allErrors = append(allErrors, errors...)

@@ -43,9 +43,12 @@ func Test(t *testing.T) {
 
 	db.Set("User", otherUser.ID, otherUser)
 
+	// Create new API
+	api := graphql.New(db)
+
 	// Create web app
 	app := aero.New()
-	app.Post("/", graphql.Handler(db))
+	app.Post("/", api.Handler())
 	query, err := ioutil.ReadFile("testdata/simple.gql")
 	assert.NoError(t, err)
 
