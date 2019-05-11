@@ -41,10 +41,20 @@ func resolve(container FieldContainer, parent interface{}, api *API) (Map, []str
 
 		switch kind {
 		case reflect.Slice:
+			// Simple types can be inserted instantly
+			sliceElementKind := reflect.TypeOf(obj).Elem().Kind()
+
+			if sliceElementKind != reflect.Ptr && sliceElementKind != reflect.Struct {
+				data[field.name] = obj
+				continue
+			}
+
+			// If we have complex types as elements and we didn't specify a field, skip it
 			if len(field.fields) == 0 {
 				continue
 			}
 
+			// Create a slice with the data we requested
 			slice := make([]Map, value.Len())
 
 			for i := 0; i < value.Len(); i++ {
