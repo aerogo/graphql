@@ -36,8 +36,6 @@ func Parse(ctx *aero.Context) (*Document, error) {
 		}
 	}
 
-	fmt.Println(request.Query)
-
 	document := &Document{}
 	var currentContainer FieldContainer
 
