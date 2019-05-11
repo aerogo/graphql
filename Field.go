@@ -78,7 +78,7 @@ func (field *Field) ResolveRootQuery(api *API) (interface{}, error) {
 	}
 
 	// "All" queries
-	if strings.HasPrefix(field.name, "All") {
+	if strings.HasPrefix(field.name, "all") {
 		return field.ResolveAll(api)
 	}
 
@@ -98,7 +98,7 @@ func (field *Field) ResolveRootQuery(api *API) (interface{}, error) {
 // ResolveAll returns a list of objects that matches the filter arguments.
 func (field *Field) ResolveAll(api *API) (interface{}, error) {
 	records := []interface{}{}
-	typeName := strings.TrimPrefix(field.name, "All")
+	typeName := strings.TrimPrefix(field.name, "all")
 
 	for argName, argValue := range field.arguments {
 		if !strings.Contains(argName, "_") {
