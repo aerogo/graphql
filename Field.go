@@ -52,12 +52,18 @@ func (field *Field) Resolve(parent interface{}, db Database) (interface{}, error
 
 // ResolveRootQuery resolves a root query.
 func (field *Field) ResolveRootQuery(db Database) (interface{}, error) {
+	// "All" queries
 	if strings.HasPrefix(field.name, "All") {
 		return field.ResolveAll(db)
 	}
 
+	// Single object queries
 	if len(field.arguments) != 1 || field.arguments["ID"] == nil {
 		return nil, errors.New("Can only query objects by 'ID'")
+	}
+
+	if !db.HasType(field.name) {
+		return nil, fmt.Errorf("Type '%s' does not exist", field.name)
 	}
 
 	return db.Get(field.name, field.arguments["ID"].(string))
@@ -68,18 +74,24 @@ func (field *Field) ResolveAll(db Database) (interface{}, error) {
 	records := []interface{}{}
 	typeName := strings.TrimPrefix(field.name, "All")
 
+	for argName, argValue := range field.arguments {
+		if !strings.Contains(argName, "_") {
+			continue
+		}
+
+		delete(field.arguments, argName)
+		argName = strings.ReplaceAll(argName, "_", ".")
+		field.arguments[argName] = argValue
+	}
+
 	for record := range db.All(typeName) {
 		matchingFields := 0
 
 		for argName, argValue := range field.arguments {
-			structField, _, value, err := mirror.GetChildField(record, argName)
+			_, _, value, err := mirror.GetPublicField(record, argName)
 
 			if err != nil {
 				return nil, err
-			}
-
-			if structField.Tag.Get("private") == "true" {
-				return nil, fmt.Errorf("'%s' is a private field", structField.Name)
 			}
 
 			switch argValue.(type) {

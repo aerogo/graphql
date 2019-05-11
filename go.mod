@@ -6,7 +6,7 @@ require (
 	github.com/aerogo/aero v1.1.8
 	github.com/aerogo/cluster v0.1.6 // indirect
 	github.com/aerogo/http v1.0.3
-	github.com/aerogo/mirror v0.2.0
+	github.com/aerogo/mirror v0.2.2
 	github.com/aerogo/nano v0.2.0
 	github.com/json-iterator/go v1.1.6
 	github.com/stretchr/testify v1.3.0

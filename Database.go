@@ -4,6 +4,7 @@ package graphql
 type Database interface {
 	Get(collection string, id string) (interface{}, error)
 	All(collection string) chan interface{}
+	HasType(typeName string) bool
 }
 
 // These could be useful in the future:

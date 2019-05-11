@@ -6,7 +6,7 @@ import (
 
 // Document represents a GraphQL request.
 type Document struct {
-	Query *Query
+	Operation *Operation
 }
 
 // Execute executes the operations defined in the GraphQL document.
@@ -14,8 +14,8 @@ func (document *Document) Execute(db Database) *Response {
 	var data interface{}
 	var allErrors []string
 
-	if document.Query != nil {
-		data, allErrors = resolve(document.Query, nil, db)
+	if document.Operation != nil {
+		data, allErrors = resolve(document.Operation, nil, db)
 	}
 
 	return &Response{

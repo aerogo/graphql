@@ -70,9 +70,22 @@ func Parse(ctx *aero.Context) (*Document, error) {
 				currentContainer = field
 			}
 
-			if blockPrefix == "" || blockPrefix == "query" {
-				document.Query = &Query{}
-				currentContainer = document.Query
+			switch blockPrefix {
+			// Query
+			case "", "query":
+				document.Operation = &Operation{
+					typ: "query",
+				}
+
+				currentContainer = document.Operation
+
+			// Mutation
+			case "mutation":
+				document.Operation = &Operation{
+					typ: "mutation",
+				}
+
+				currentContainer = document.Operation
 			}
 
 			processedUntil = i + 1
