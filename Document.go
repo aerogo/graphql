@@ -36,15 +36,16 @@ func resolve(container FieldContainer, parent interface{}, api *API) (Map, []str
 			allErrors = append(allErrors, err.Error())
 		}
 
-		value := reflect.ValueOf(obj)
-		kind := reflect.Indirect(value).Kind()
+		value := reflect.Indirect(reflect.ValueOf(obj))
+		kind := value.Kind()
 
 		switch kind {
 		case reflect.Slice:
 			// Simple types can be inserted instantly
-			sliceElementKind := reflect.TypeOf(obj).Elem().Kind()
+			sliceType := value.Type()
+			sliceElementKind := sliceType.Elem().Kind()
 
-			if sliceElementKind != reflect.Ptr && sliceElementKind != reflect.Struct {
+			if sliceElementKind != reflect.Interface && sliceElementKind != reflect.Ptr && sliceElementKind != reflect.Struct {
 				data[field.name] = obj
 				continue
 			}
