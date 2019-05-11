@@ -52,6 +52,15 @@ func (field *Field) Resolve(parent interface{}, api *API) (interface{}, error) {
 
 // ResolveRootQuery resolves a root query.
 func (field *Field) ResolveRootQuery(api *API) (interface{}, error) {
+	// Custom resolvers
+	for _, resolve := range api.rootResolvers {
+		obj, ok := resolve(field.name, field.arguments)
+
+		if ok {
+			return obj, nil
+		}
+	}
+
 	// "All" queries
 	if strings.HasPrefix(field.name, "All") {
 		return field.ResolveAll(api)
@@ -62,6 +71,7 @@ func (field *Field) ResolveRootQuery(api *API) (interface{}, error) {
 		return nil, errors.New("Can only query objects by 'ID'")
 	}
 
+	// Return an error if the type doesn't exist
 	if !api.db.HasType(field.name) {
 		return nil, fmt.Errorf("Type '%s' does not exist", field.name)
 	}
