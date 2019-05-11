@@ -1,11 +1,7 @@
 {
-	__type(name: "User") {
-		name
-		fields {
+	__schema {
+		types {
 			name
-			type {
-				name
-			}
 		}
 	}
 }

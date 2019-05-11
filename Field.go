@@ -77,14 +77,14 @@ func (field *Field) ResolveRootQuery(api *API) (interface{}, error) {
 		}
 	}
 
+	// Schema query
+	if field.name == "__schema" {
+		return api.schema, nil
+	}
+
 	// "All" queries
 	if strings.HasPrefix(field.name, "all") {
 		return field.ResolveAll(api)
-	}
-
-	// Single object queries
-	if len(field.arguments) != 1 || field.arguments["ID"] == nil {
-		return nil, errors.New("Can only query objects by 'ID'")
 	}
 
 	// Return an error if the type doesn't exist
@@ -92,7 +92,19 @@ func (field *Field) ResolveRootQuery(api *API) (interface{}, error) {
 		return nil, fmt.Errorf("Type '%s' does not exist", field.name)
 	}
 
-	return api.db.Get(field.name, field.arguments["ID"].(string))
+	// Single object queries
+	if len(field.arguments) != 1 {
+		return nil, errors.New("Single object queries require must specify an ID and nothing else")
+	}
+
+	for _, id := range field.arguments {
+		return api.db.Get(field.name, id.(string))
+	}
+
+	// This code is actually unreachable,
+	// but the linter is too dumb to realize that
+	// so we're going to end it with a return statement.
+	return nil, nil
 }
 
 // ResolveAll returns a list of objects that matches the filter arguments.

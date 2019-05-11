@@ -10,12 +10,26 @@ import (
 type API struct {
 	db            Database
 	rootResolvers []Resolver
+	schema        *Schema
 }
 
 // New creates a new GraphQL API.
 func New(db Database) *API {
+	schemaTypes := []SchemaType{}
+
+	for _, typ := range db.Types() {
+		schemaTypes = append(schemaTypes, SchemaType{
+			Name: typ.Name(),
+		})
+	}
+
+	schema := &Schema{
+		Types: schemaTypes,
+	}
+
 	return &API{
-		db: db,
+		db:     db,
+		schema: schema,
 	}
 }
 
