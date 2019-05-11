@@ -92,13 +92,14 @@ func (api *API) Handler() aero.Handle {
 		document, err := Parse(ctx)
 
 		if err != nil {
-			ctx.StatusCode = http.StatusBadRequest
-
-			return ctx.JSON(&Response{
-				Errors: []string{
-					err.Error(),
-				},
-			})
+			return ctx.Error(
+				http.StatusBadRequest,
+				ctx.JSON(&Response{
+					Errors: []string{
+						err.Error(),
+					},
+				}),
+			)
 		}
 
 		return ctx.JSON(document.Execute(api))
