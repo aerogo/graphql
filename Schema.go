@@ -1,24 +1,24 @@
 package graphql
 
-type __Schema struct {
-	Types            []__SchemaType     `json:"types"`
-	QueryType        __QueryType        `json:"queryType"`
-	MutationType     __MutationType     `json:"mutationType"`
-	SubscriptionType __SubscriptionType `json:"subscriptionType"`
+type Schema struct {
+	Types            []SchemaType     `json:"types"`
+	QueryType        QueryType        `json:"queryType"`
+	MutationType     MutationType     `json:"mutationType"`
+	SubscriptionType SubscriptionType `json:"subscriptionType"`
 }
 
-type __SchemaType struct {
+type SchemaType struct {
 	Name string `json:"name"`
 }
 
-type __QueryType struct {
+type QueryType struct {
 	Name string `json:"name"`
 }
 
-type __MutationType struct {
+type MutationType struct {
 	Name string `json:"name"`
 }
 
-type __SubscriptionType struct {
+type SubscriptionType struct {
 	Name string `json:"name"`
 }

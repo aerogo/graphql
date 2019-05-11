@@ -16,7 +16,7 @@ type API struct {
 	rootResolvers []Resolver
 
 	// The schema we compile on creation
-	schema __Schema
+	schema Schema
 
 	// A map of type names to field aliases
 	aliases map[string]AliasMap
@@ -27,10 +27,10 @@ func New(db Database) *API {
 	aliases := map[string]AliasMap{}
 
 	// Introspection
-	schemaTypes := []__SchemaType{}
+	schemaTypes := []SchemaType{}
 
 	for _, typ := range db.Types() {
-		schemaTypes = append(schemaTypes, __SchemaType{
+		schemaTypes = append(schemaTypes, SchemaType{
 			Name: typ.Name(),
 		})
 
@@ -41,25 +41,25 @@ func New(db Database) *API {
 		registerJSONAliases(typ, aliases)
 	}
 
-	schemaType := __SchemaType{
+	schemaType := SchemaType{
 		Name: "__Schema",
 	}
 
 	schemaTypes = append(schemaTypes)
 
-	queryType := __QueryType{
+	queryType := QueryType{
 		Name: "Query",
 	}
 
-	mutationType := __MutationType{
+	mutationType := MutationType{
 		Name: "Mutation",
 	}
 
-	subscriptionType := __SubscriptionType{
+	subscriptionType := SubscriptionType{
 		Name: "Subscription",
 	}
 
-	schema := __Schema{
+	schema := Schema{
 		Types:            schemaTypes,
 		QueryType:        queryType,
 		MutationType:     mutationType,
@@ -76,23 +76,6 @@ func New(db Database) *API {
 		db:      db,
 		schema:  schema,
 		aliases: aliases,
-	}
-}
-
-// registerJSONAliases checks all fields for json tags and adds the tags as field aliases.
-func registerJSONAliases(typ reflect.Type, aliases map[string]AliasMap) {
-	typeAliases := AliasMap{}
-	aliases[typ.Name()] = typeAliases
-
-	for i := 0; i < typ.NumField(); i++ {
-		field := typ.Field(i)
-		jsonTag := field.Tag.Get("json")
-
-		if jsonTag == "" || jsonTag == "-" {
-			continue
-		}
-
-		typeAliases[jsonTag] = field.Name
 	}
 }
 

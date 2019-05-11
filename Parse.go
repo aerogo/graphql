@@ -36,6 +36,8 @@ func Parse(ctx *aero.Context) (*Document, error) {
 		}
 	}
 
+	fmt.Println(request.Query)
+
 	document := &Document{}
 	var currentContainer FieldContainer
 
@@ -89,8 +91,14 @@ func Parse(ctx *aero.Context) (*Document, error) {
 			}
 
 			processedUntil = i + 1
+
 		case '}':
 			processedUntil = i + 1
+
+			if currentContainer == nil {
+				return nil, fmt.Errorf("Encountered '}' without an opening '{'")
+			}
+
 			currentContainer = currentContainer.Parent()
 
 		case '\n':
