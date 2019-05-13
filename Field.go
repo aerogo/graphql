@@ -27,7 +27,7 @@ func (field *Field) Fields() []*Field {
 	return field.fields
 }
 
-// Parent is always nil for queries.
+// Returns the field's parent.
 func (field *Field) Parent() FieldContainer {
 	return field.parent
 }

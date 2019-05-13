@@ -16,7 +16,7 @@ func (operation *Operation) Fields() []*Field {
 	return operation.fields
 }
 
-// Parent is always nil for queries.
+// Parent is always nil for operations.
 func (operation *Operation) Parent() FieldContainer {
 	return nil
 }
