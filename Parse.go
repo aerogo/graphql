@@ -11,13 +11,13 @@ import (
 )
 
 // Parse parses the request from the body reader and returns a GraphQL document.
-func Parse(ctx *aero.Context) (*Document, error) {
+func Parse(ctx aero.Context) (*Document, error) {
 	httpRequest := ctx.Request()
 	reader := httpRequest.Body().Reader()
 	request := Request{}
 	var err error
 
-	if httpRequest.Header().Get("Content-Type") == "application/graphql" {
+	if httpRequest.Header("Content-Type") == "application/graphql" {
 		// Body contains only the query
 		body, err := ioutil.ReadAll(reader)
 

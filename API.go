@@ -87,8 +87,8 @@ func (api *API) AddRootResolver(resolver Resolver) {
 }
 
 // Handler returns a function that deals with a GraphQL request and responds to it.
-func (api *API) Handler() aero.Handle {
-	return func(ctx *aero.Context) string {
+func (api *API) Handler() aero.Handler {
+	return func(ctx aero.Context) error {
 		document, err := Parse(ctx)
 
 		if err != nil {
