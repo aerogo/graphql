@@ -1,16 +1,17 @@
 package graphql_test
 
 import (
-	"fmt"
+	"bytes"
 	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
 	"strings"
-	"syscall"
 	"testing"
 
 	"github.com/aerogo/aero"
 	"github.com/aerogo/graphql"
-	"github.com/aerogo/http/client"
 	"github.com/aerogo/nano"
+	jsoniter "github.com/json-iterator/go"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -23,7 +24,7 @@ type User struct {
 
 func Test(t *testing.T) {
 	// Fill database with sample data
-	db := nano.New(5000).Namespace("test").RegisterTypes((*User)(nil))
+	db := nano.New(nano.Configuration{Port: 5000}).Namespace("test").RegisterTypes((*User)(nil))
 	defer db.Close()
 	defer db.Clear("User")
 
@@ -52,30 +53,26 @@ func Test(t *testing.T) {
 	query, err := ioutil.ReadFile("testdata/simple.gql")
 	assert.NoError(t, err)
 
-	app.OnStart(func() {
-		// Request
-		request := client.Post(fmt.Sprintf("http://localhost:%d/", app.Config.Ports.HTTP))
+	gqlRequest := &graphql.Request{
+		Query: string(query),
+		Variables: graphql.Map{
+			"id": testUser.ID,
+		},
+	}
 
-		request = request.BodyJSON(&graphql.Request{
-			Query: string(query),
-			Variables: graphql.Map{
-				"id": testUser.ID,
-			},
-		})
+	gqlRequestBody, err := jsoniter.Marshal(gqlRequest)
 
-		response, err := request.End()
+	if err != nil {
+		t.Fatal(err)
+	}
 
-		// Error checks
-		assert.NoError(t, err)
-		assert.NotNil(t, response)
-		assert.True(t, response.Ok(), "Status %d", response.StatusCode())
-		fmt.Println(response.String())
-		assert.True(t, strings.Contains(response.String(), testUser.Nick))
+	request := httptest.NewRequest("POST", "/", bytes.NewReader(gqlRequestBody))
+	response := httptest.NewRecorder()
+	app.ServeHTTP(response, request)
 
-		// Kill server
-		err = syscall.Kill(syscall.Getpid(), syscall.SIGTERM)
-		assert.NoError(t, err)
-	})
-
-	app.Run()
+	// Error checks
+	assert.NoError(t, err)
+	assert.NotNil(t, response)
+	assert.Equal(t, http.StatusOK, response.Code)
+	assert.True(t, strings.Contains(response.Body.String(), testUser.Nick))
 }
