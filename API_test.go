@@ -11,8 +11,8 @@ import (
 	"github.com/aerogo/aero"
 	"github.com/aerogo/graphql"
 	"github.com/aerogo/nano"
+	"github.com/akyoto/assert"
 	jsoniter "github.com/json-iterator/go"
-	"github.com/stretchr/testify/assert"
 )
 
 // User as a type of sample data
@@ -51,7 +51,7 @@ func Test(t *testing.T) {
 	app := aero.New()
 	app.Post("/", api.Handler())
 	query, err := ioutil.ReadFile("testdata/simple.gql")
-	assert.NoError(t, err)
+	assert.Nil(t, err)
 
 	gqlRequest := &graphql.Request{
 		Query: string(query),
@@ -71,7 +71,7 @@ func Test(t *testing.T) {
 	app.ServeHTTP(response, request)
 
 	// Error checks
-	assert.NoError(t, err)
+	assert.Nil(t, err)
 	assert.NotNil(t, response)
 	assert.Equal(t, http.StatusOK, response.Code)
 	assert.True(t, strings.Contains(response.Body.String(), testUser.Nick))
