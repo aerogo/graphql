@@ -5,6 +5,7 @@ type Schema struct {
 	QueryType        QueryType        `json:"queryType"`
 	MutationType     MutationType     `json:"mutationType"`
 	SubscriptionType SubscriptionType `json:"subscriptionType"`
+	Directives       []Directive      `json:"directives"`
 }
 
 type SchemaType struct {
@@ -21,4 +22,9 @@ type MutationType struct {
 
 type SubscriptionType struct {
 	Name string `json:"name"`
+}
+
+type Directive struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
 }

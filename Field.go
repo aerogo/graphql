@@ -36,7 +36,7 @@ func (field *Field) Parent() FieldContainer {
 func (field *Field) Resolve(parent interface{}, api *API) (interface{}, error) {
 	// If we have no parent object, treat it as a root query
 	if parent == nil {
-		return field.ResolveRootQuery(api)
+		return field.resolveRootQuery(api)
 	}
 
 	// Allow querying the current type name
@@ -77,8 +77,8 @@ func (field *Field) Resolve(parent interface{}, api *API) (interface{}, error) {
 	return value.Interface(), nil
 }
 
-// ResolveRootQuery resolves a root query.
-func (field *Field) ResolveRootQuery(api *API) (interface{}, error) {
+// resolveRootQuery resolves a root query.
+func (field *Field) resolveRootQuery(api *API) (interface{}, error) {
 	// Custom resolvers
 	for _, resolve := range api.rootResolvers {
 		obj, err, ok := resolve(field.name, field.arguments)
