@@ -45,7 +45,7 @@ func New(db Database) *API {
 		Name: "__Schema",
 	}
 
-	schemaTypes = append(schemaTypes)
+	schemaTypes = append(schemaTypes, schemaType)
 
 	queryType := QueryType{
 		Name: "Query",
